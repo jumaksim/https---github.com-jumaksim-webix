@@ -16,7 +16,7 @@ export default class ContactFormView extends JetView {
 			margin:10,
 			rows:[
 				{
-					view:"text", name:"firstname",
+					view:"text", name:"firstName",
 					label:"First Name", labelPosition:"top",
 					placeholder:"First Name",
 					invalidMessage:"A first name is required",
@@ -25,7 +25,7 @@ export default class ContactFormView extends JetView {
 					}
 				},
 				{
-					view:"text", name:"lastname",
+					view:"text", name:"lastName",
 					label:"Last Name", labelPosition:"top",
 					placeholder:"Last Name",
 					invalidMessage:"A last name is required",
@@ -43,7 +43,7 @@ export default class ContactFormView extends JetView {
 					}
 				},
 				{
-					view:"richselect", name:"role",
+					view:"richselect", name:"roleType",
 					label:"Role", labelPosition:"top",
 					placeholder:"Role",
 					value:"USER", 
@@ -171,7 +171,15 @@ export default class ContactFormView extends JetView {
 						var form = pView.mb.getChildViews()[1].getChildViews()[0];
 						console.log(form);
 						if (form.validate()){
-							session.authajax().post(session.SERVER + "/api/" + OBJECT, {firstName:form.getValues().firstname, lastName:form.getValues().lastname, email:form.getValues().email, roleType:form.getValues().role}).then(a => { webix.message("Saved!", "success");pView.mb.close();pView.$scope.refreshData();});
+							var method = "post";
+							var url = session.SERVER + "/api/" + OBJECT;
+							if(form.getValues().link)
+							{
+								method = "put";
+								url = form.getValues().link;
+							}
+							session.authajax()[method](url, {firstName:form.getValues().firstName, lastName:form.getValues().lastName, email:form.getValues().email, roleType:form.getValues().roleType}).then(a => { webix.message("Saved!", "success");pView.mb.close();
+							if(pView.refreshData){pView.refreshData();}else if(pView.$scope.refreshData){pView.$scope.refreshData();}});
 						}
 					}
 				}
@@ -190,8 +198,8 @@ export default class ContactFormView extends JetView {
 						buttons
 					],
 					rules:{
-						"firstname":webix.rules.isNotEmpty,
-						"lastname":webix.rules.isNotEmpty,
+						"firstName":webix.rules.isNotEmpty,
+						"lastName":webix.rules.isNotEmpty,
 						"email":webix.rules.isNotEmpty
 					}
 				}

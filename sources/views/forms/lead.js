@@ -14,6 +14,10 @@ export default class LeadFormView extends JetView {
 			margin:10,
 			rows:[
 				{
+					view:"text", name:"link",
+					label:"link", labelPosition:"top",hidden:true
+				},
+				{
 					view:"text", name:"name",
 					label:"Name", labelPosition:"top",
 					placeholder:"Name",
@@ -146,7 +150,16 @@ export default class LeadFormView extends JetView {
 						var form = pView.mb.getChildViews()[1].getChildViews()[0];
 						console.log(form);
 						if (form.validate()){
-							session.authajax().post(session.SERVER + "/api/leads", {name:form.getValues().name, email:form.getValues().email}).then(a => { webix.message("Saved!", "success");pView.mb.close();pView.$scope.refreshData();document.location = "#!/main.tab/portfolio/portfolio.leads";});
+							var method = "post";
+							var url = session.SERVER + "/api/leads";
+							if(form.getValues().link)
+							{
+								method = "put";
+								url = form.getValues().link;
+							}
+							session.authajax()[method](url, {name:form.getValues().name, email:form.getValues().email}).then(a => { webix.message("Saved!", "success");pView.mb.close();
+							pView.refreshData();
+							});
 						}
 					}
 				}
@@ -159,7 +172,7 @@ export default class LeadFormView extends JetView {
 				//{ template:"<a href='#!/main.tab/portfolio/portfolio.leads'>Back</a>", type:"header" },
 				//{ template:"New Lead", type:"header" },
 				{
-					view:"form", localId:"form", padding:24,
+					view:"form", id:"objectForm", localId:"form", padding:24,
 					rows:[
 						upper_section,
 						buttons
@@ -173,7 +186,7 @@ export default class LeadFormView extends JetView {
 		};
 	}
 	config(){
-		return getConfig();
+		return getConfig.call(this);
 	}
 	init(){
 		/*this.$$("form").setValues({
